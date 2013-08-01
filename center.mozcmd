@@ -28,6 +28,7 @@
     exec: function(args, context) {
       if (args.width && args.height)
         resizeTo(args.width, args.height);
+
       let win = document.documentElement;
       moveTo((screen.availWidth - win.width) / 2, (screen.availHeight - win.height) / 2);
     }

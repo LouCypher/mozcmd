@@ -10,21 +10,37 @@
 [
   {
     name: "winsize",
-    description: "Resize browser window",
+    description: "Resize browser window. If no parameters entered, display window size",
     params: [
       {
         name: "width",
         type: "number",
+        defaultValue: null,
         description: "Browser width",
       },
       {
         name: "height",
         type: "number",
+        defaultValue: null,
         description: "Browser height",
       }
     ],
+    returnType: "string",
     exec: function(args, context) {
-      resizeTo(args.width, args.height);
+      let width = args.width;
+      let height = args.height;
+      if (width && height) {
+        resizeTo(width, height);
+        return "Resized to " + width + "x" + height;
+      }
+
+      let win = document.documentElement;
+      switch (windowState) {
+        case 3: // normal
+          return win.width + "x" + win.height;
+        case 1: // maximized
+          return win.clientWidth + "x" + win.clientHeight;
+      }
     }
   }
 ]

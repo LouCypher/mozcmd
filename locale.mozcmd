@@ -15,7 +15,7 @@
       {
         name: "langID",
         type: "string",
-        defaultValue: "",
+        defaultValue: null,
         description: "Language ID.\nUse empty string to use default locale."
       }
     ],
@@ -26,6 +26,7 @@
         prefs.setCharPref(prefname, args.langID);
       else
         prefs.clearUserPref(prefname);
+
       return prefs.getCharPref(prefname);
     }
   }
