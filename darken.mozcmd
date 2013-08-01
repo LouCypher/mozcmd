@@ -1,0 +1,64 @@
+/*
+ *  This Source Code Form is subject to the terms of the Mozilla Public
+ *  License, v. 2.0. If a copy of the MPL was not distributed with this
+ *  file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ *
+ *  Contributor(s):
+ *  - LouCypher (original code)
+ */
+
+[
+  {
+    name: "darken",
+    description: "Darken content area",
+    params: [
+      {
+        name: "level",
+        type: "number",
+        defaultValue: 25,
+        description: "Dark level. 0 = normal; 100 = pitch black. Default = 25",
+      }
+    ],
+    exec: function(args, context) {
+      let sss = Cc["@mozilla.org/content/style-sheet-service;1"].
+                getService(Ci.nsIStyleSheetService);
+
+      let prefs = Services.prefs.getBranch("darken.");
+      let data = ""
+      try {
+        data = prefs.getCharPref("data");
+      } catch(ex) {}
+
+      let darkLevel = args.level;
+      let opacity = 100;
+      if (darkLevel > 50)
+        opacity = (100 - darkLevel) / 100;
+      else if (darkLevel < 50)
+        opacity = (100 - darkLevel) / 100;
+      else
+        opacity = darkLevel / 100;
+
+      if (data || opacity == 1)
+        if (sss.sheetRegistered(makeURI(data), sss.USER_SHEET))
+          sss.unregisterSheet(makeURI(data), sss.USER_SHEET);
+
+      if (opacity == 1)
+        return;
+
+      /*
+          CSS copied from 'Global - Pseudo Brightness Control`
+          http://userstyles.org/styles/45663
+          by luckymouse
+          http://userstyles.org/users/14255
+      */
+      let css = "@namespace url(http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul);\
+                 @-moz-document url(chrome://browser/content/browser.xul){\
+                 #browser{background-color:#000!important}\
+                 #content{opacity:" + opacity + "!important}}";
+
+      data = "data:text/css,/*GCLI-darken.mozcmd*/" + encodeURIComponent(css);
+      sss.loadAndRegisterSheet(makeURI(data), sss.USER_SHEET);
+      prefs.setCharPref("data", data);
+    }
+  }
+]
