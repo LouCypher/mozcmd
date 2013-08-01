@@ -50,6 +50,8 @@
           http://userstyles.org/styles/45663
           by luckymouse
           http://userstyles.org/users/14255
+          License under Public Domain Dedication 
+          http://creativecommons.org/publicdomain/zero/1.0/
       */
       let css = "@namespace url(http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul);\
                  @-moz-document url(chrome://browser/content/browser.xul){\
