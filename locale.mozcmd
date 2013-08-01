@@ -1,0 +1,32 @@
+/*
+ *  This Source Code Form is subject to the terms of the Mozilla Public
+ *  License, v. 2.0. If a copy of the MPL was not distributed with this
+ *  file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ *
+ *  Contributor(s):
+ *  - LouCypher (original code)
+ */
+
+[
+  {
+    name: "locale",
+    description: "Change browser locale",
+    params: [
+      {
+        name: "langID",
+        type: "string",
+        defaultValue: "",
+        description: "Language ID.\nUse empty string to use default locale."
+      }
+    ],
+    exec: function(args, context) {
+      let prefname = "general.useragent.locale";
+      let prefs = Services.prefs;
+      if (args.langID)
+        prefs.setCharPref(prefname, args.langID);
+      else
+        prefs.clearUserPref(prefname);
+      return prefs.getCharPref(prefname);
+    }
+  }
+]

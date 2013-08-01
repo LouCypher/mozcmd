@@ -1,0 +1,30 @@
+/*
+ *  This Source Code Form is subject to the terms of the Mozilla Public
+ *  License, v. 2.0. If a copy of the MPL was not distributed with this
+ *  file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ *
+ *  Contributor(s):
+ *  - LouCypher (original code)
+ */
+
+[
+  {
+    name: "winsize",
+    description: "Resize browser window",
+    params: [
+      {
+        name: "width",
+        type: "number",
+        description: "Browser width",
+      },
+      {
+        name: "height",
+        type: "number",
+        description: "Browser height",
+      }
+    ],
+    exec: function(args, context) {
+      resizeTo(args.width, args.height);
+    }
+  }
+]

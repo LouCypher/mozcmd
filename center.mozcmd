@@ -1,0 +1,35 @@
+/*
+ *  This Source Code Form is subject to the terms of the Mozilla Public
+ *  License, v. 2.0. If a copy of the MPL was not distributed with this
+ *  file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ *
+ *  Contributor(s):
+ *  - LouCypher (original code)
+ */
+
+[
+  {
+    name: "center",
+    description: "Center browser on screen",
+    params: [
+      {
+        name: "width",
+        type: "number",
+        defaultValue: null,
+        description: "Browser width",
+      },
+      {
+        name: "height",
+        type: "number",
+        defaultValue: null,
+        description: "Browser height",
+      }
+    ],
+    exec: function(args, context) {
+      if (args.width && args.height)
+        resizeTo(args.width, args.height);
+      let win = document.documentElement;
+      moveTo((screen.availWidth - win.width) / 2, (screen.availHeight - win.height) / 2);
+    }
+  }
+]
