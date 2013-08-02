@@ -7,60 +7,49 @@
  *  - LouCypher (original code)
  */
 
+/*
+    Style based on 'Global - Pseudo Brightness Control' userstyle
+    http://userstyles.org/styles/45663
+    by luckymouse
+    http://userstyles.org/users/14255
+    License under Public Domain Dedication 
+    http://creativecommons.org/publicdomain/zero/1.0/
+*/
+
 [
   {
     name: "darken",
     description: "Darken content area",
     params: [
       {
-        name: "level",
+        name: "Dark level",
         type: "number",
-        defaultValue: 25,
-        description: "Dark level. 0 = normal; 100 = pitch black. Default = 25",
+        defaultValue: 15,
+        description: "0 = normal; 100 = pitch black. Default = 15",
       }
     ],
     exec: function(args, context) {
-      let sss = Cc["@mozilla.org/content/style-sheet-service;1"].
-                getService(Ci.nsIStyleSheetService);
+      Services.prefs.clearUserPref("darken.data"); // Remove old prefs
 
-      let prefs = Services.prefs.getBranch("darken.");
-      let data = ""
-      try {
-        data = prefs.getCharPref("data");
-      } catch(ex) {}
+      let darkLevel = args["Dark level"];
+      if (darkLevel < 0) darkLevel = 0;
+      if (darkLevel > 100) darkLevel = 100;
 
-      let darkLevel = args.level;
-      let opacity = 100;
-      if (darkLevel > 50)
-        opacity = (100 - darkLevel) / 100;
-      else if (darkLevel < 50)
-        opacity = (100 - darkLevel) / 100;
-      else
+      let opacity = 0;
+      if (darkLevel === 50)
         opacity = darkLevel / 100;
+      else
+        opacity = (100 - darkLevel) / 100;
 
-      if (data || opacity == 1)
-        if (sss.sheetRegistered(makeURI(data), sss.USER_SHEET))
-          sss.unregisterSheet(makeURI(data), sss.USER_SHEET);
-
-      if (opacity == 1)
-        return;
-
-      /*
-          CSS copied from 'Global - Pseudo Brightness Control`
-          http://userstyles.org/styles/45663
-          by luckymouse
-          http://userstyles.org/users/14255
-          License under Public Domain Dedication 
-          http://creativecommons.org/publicdomain/zero/1.0/
-      */
-      let css = "@namespace url(http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul);\
-                 @-moz-document url(chrome://browser/content/browser.xul){\
-                 #browser{background-color:#000!important}\
-                 #content{opacity:" + opacity + "!important}}";
-
-      data = "data:text/css,/*GCLI-darken.mozcmd*/" + encodeURIComponent(css);
-      sss.loadAndRegisterSheet(makeURI(data), sss.USER_SHEET);
-      prefs.setCharPref("data", data);
+      let browser = document.getElementById("browser");
+      if (opacity === 1 || gBrowser.style.opacity === opacity.toString()) {
+        browser.style.backgroundColor = "";
+        gBrowser.style.opacity = "";
+      }
+      else {
+        browser.style.backgroundColor = "black";
+        gBrowser.style.opacity = opacity;
+      }
     }
   }
 ]
