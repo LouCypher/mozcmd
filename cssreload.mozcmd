@@ -1,7 +1,7 @@
 [
   {
     name: "cssreload",
-    description: "Reload CSS on current page",
+    description: "Reload CSS on current page.",
     exec: function(args, context) {
       // @name      CSS Reloader
       // @author    Kenneth Auchenberg

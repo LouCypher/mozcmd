@@ -10,7 +10,7 @@
 [
   {
     name: "winsize",
-    description: "Resize browser window. If no parameters entered, display window size",
+    description: "Resize browser window. If no parameters entered, display window size.",
     params: [
       {
         name: "width",

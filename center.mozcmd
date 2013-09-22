@@ -10,7 +10,7 @@
 [
   {
     name: "center",
-    description: "Center browser on screen",
+    description: "Center browser window on screen.",
     params: [
       {
         name: "width",

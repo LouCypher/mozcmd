@@ -1,0 +1,34 @@
+/*
+ *  This Source Code Form is subject to the terms of the Mozilla Public
+ *  License, v. 2.0. If a copy of the MPL was not distributed with this
+ *  file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ *
+ *  Contributor(s):
+ *  - LouCypher (original code)
+ */
+
+[
+  {
+    name: "escape",
+    description: "Escape string and copy the result to clipboard.",
+    params: [
+      {
+        name: "string",
+        type: "string",
+        defaultValue: "",
+        description: "String to escape. If no parameter specified, escape current URL."
+      }
+    ],
+    returnType: "string",
+    exec: function(args, context) {
+      let string = args.string;
+      if (string === "")
+        string = content.location.href;
+      let escaped = encodeURIComponent(string);
+      let clipboardHelper = Cc["@mozilla.org/widget/clipboardhelper;1"].
+                            getService(Ci.nsIClipboardHelper);
+      clipboardHelper.copyString(escaped);
+      return escaped;
+    }
+  }
+]

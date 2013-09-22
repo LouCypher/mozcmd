@@ -10,7 +10,7 @@
 [
   {
     name: "locale",
-    description: "Change browser locale",
+    description: "Change browser locale.",
     params: [
       {
         name: "langID",
@@ -19,6 +19,7 @@
         description: "Language ID.\nUse empty string to use default locale."
       }
     ],
+    returnType: "string",
     exec: function(args, context) {
       let prefname = "general.useragent.locale";
       let prefs = Services.prefs;

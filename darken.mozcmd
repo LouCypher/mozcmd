@@ -19,7 +19,7 @@
 [
   {
     name: "darken",
-    description: "Darken content area",
+    description: "Darken content area.",
     params: [
       {
         name: "Dark level",

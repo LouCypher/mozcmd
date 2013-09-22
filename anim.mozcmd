@@ -1,0 +1,39 @@
+/*
+ *  This Source Code Form is subject to the terms of the Mozilla Public
+ *  License, v. 2.0. If a copy of the MPL was not distributed with this
+ *  file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ *
+ *  Contributor(s):
+ *  - LouCypher (original code)
+ */
+
+[
+  {
+    name: "anim",
+    description: "Change image animation mode.",
+    params: [
+      {
+        name: "mode",
+        type: "string",
+        defaultValue: "",
+        description: "Animation mode (normal, once or none)."
+      }
+    ],
+    returnType: "string",
+    exec: function(args, context) {
+      let prefname = "image.animation_mode";
+      let prefs = Services.prefs;
+      switch (args.mode) {
+        case "": break;
+        case "normal":
+        case "once":
+        case "none":
+          prefs.setCharPref(prefname, args.mode);
+          break;
+        default:
+          return "Syntax: anim [normal | once | none]";
+      }
+      return "Animation mode is '" + prefs.getCharPref(prefname) + "'";
+    }
+  }
+]
