@@ -10,17 +10,11 @@
 
 const { classes: Cc, interfaces: Ci, utils: Cu } = Components;
 
+Cu.import("resource://gre/modules/AddonManager.jsm");
 Cu.import("resource://gre/modules/Services.jsm");
 Cu.import("resource:///modules/devtools/gcli.jsm");
 
 function startup(data, reason) {
-/*
-
-  gcli.addCommand({
-  })
-
-*/
-
   // anim
   gcli.addCommand({
     name: "anim",
@@ -28,26 +22,19 @@ function startup(data, reason) {
     params: [
       {
         name: "mode",
-        type: "string",
-        defaultValue: null,
-        description: "Animation mode (normal, once or none)."
+        type: {
+          name: "selection",
+          data: ["normal", "once", "none"]
+        },
+        description: "Animation mode."
       }
     ],
     returnType: "string",
     exec: function(args, context) {
       let prefname = "image.animation_mode";
       let prefs = Services.prefs;
-      switch (args.mode) {
-        case "": break;
-        case "normal":
-        case "once":
-        case "none":
-          prefs.setCharPref(prefname, args.mode);
-          break;
-        default:
-          return "Syntax: anim [normal | once | none]";
-      }
-      return "Animation mode is '" + prefs.getCharPref(prefname) + "'";
+      prefs.setCharPref(prefname, args.mode);
+      return "Animation mode is set to '" + prefs.getCharPref(prefname) + "'";
     }
   })
 
