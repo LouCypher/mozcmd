@@ -178,6 +178,29 @@ function startup(data, reason) {
     }
   })
 
+  // JS Enabled
+  gcli.addCommand({
+    name: "jsenabled",
+    description: "Toggle enable/disable JavaScript.",
+    params: [
+      {
+        name: "reload",
+        type: "boolean",
+        description: "Reload current document."
+      }
+    ],
+    returnType: "string",
+    exec: function(args, context) {
+      let prefname = "javascript.enabled";
+      let prefs = Services.prefs;
+      let jsEnabled = prefs.getBoolPref(prefname);
+      prefs.setBoolPref(prefname, !jsEnabled);
+      if (args.reload)
+        context.environment.window.location.reload();
+      return "JavaScript is " + (!jsEnabled ? "enabled" : "disabled") + ".";
+    }
+  })
+
   // locale
   gcli.addCommand({
     name: "locale",
@@ -335,7 +358,8 @@ function startup(data, reason) {
 }
 
 function shutdown(data, reason) {
-  ["anim", "cssreload", "chkupd", "darken", "escape", "locale", "unescape", "vs", "whois", "winsize"].
+  ["anim", "cssreload", "chkupd", "darken", "escape", "jsenabled",
+   "locale", "unescape", "vs", "whois", "winsize"].
   forEach(function(cmd) {
     gcli.removeCommand(cmd);
   })

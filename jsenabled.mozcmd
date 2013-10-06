@@ -1,0 +1,32 @@
+/*
+ *  This Source Code Form is subject to the terms of the Mozilla Public
+ *  License, v. 2.0. If a copy of the MPL was not distributed with this
+ *  file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ *
+ *  Contributor(s):
+ *  - LouCypher (original code)
+ */
+
+[
+  {
+    name: "jsenabled",
+    description: "Toggle enable/disable JavaScript.",
+    params: [
+      {
+        name: "reload",
+        type: "boolean",
+        description: "Reload current document."
+      }
+    ],
+    returnType: "string",
+    exec: function(args, context) {
+      let prefname = "javascript.enabled";
+      let prefs = Services.prefs;
+      let jsEnabled = prefs.getBoolPref(prefname);
+      prefs.setBoolPref(prefname, !jsEnabled);
+      if (args.reload)
+        context.environment.window.location.reload();
+      return "JavaScript is " + (!jsEnabled ? "enabled" : "disabled") + ".";
+    }
+  }
+]
