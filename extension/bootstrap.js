@@ -87,9 +87,13 @@ function startup(data, reason) {
     params: [
       {
         name: "Dark level",
-        type: "number",
+        type: {
+          name: "number",
+          min: 0,
+          max: 100,
+        },
         defaultValue: 15,
-        description: "0 = normal; 100 = pitch black. Default = 15",
+        description: "0 = normal; 100 = pitch black. Default = 15"
       }
     ],
     exec: function(args, context) {
