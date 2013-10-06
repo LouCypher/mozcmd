@@ -15,20 +15,42 @@
       {
         name: "string",
         type: "string",
-        defaultValue: "",
+        defaultValue: null,
         description: "String to escape. If no parameter specified, escape current URL."
       }
     ],
     returnType: "string",
     exec: function(args, context) {
       let string = args.string;
-      if (string === "")
-        string = content.location.href;
+      if (!string)
+        string = context.environment.window.location.href;
       let escaped = encodeURIComponent(string);
       let clipboardHelper = Cc["@mozilla.org/widget/clipboardhelper;1"].
                             getService(Ci.nsIClipboardHelper);
       clipboardHelper.copyString(escaped);
       return escaped;
     }
+  },
+
+  {
+    name: "unescape",
+    description: "Unescape string and copy the result to clipboard.",
+    params: [
+      {
+        name: "string",
+        type: "string",
+        description: "String to unescape."
+      }
+    ],
+    returnType: "string",
+    exec: function(args, context) {
+      let string = args.string;
+      let unescaped = decodeURIComponent(string);
+      let clipboardHelper = Cc["@mozilla.org/widget/clipboardhelper;1"].
+                            getService(Ci.nsIClipboardHelper);
+      clipboardHelper.copyString(unescaped);
+      return unescaped;
+    }
   }
+
 ]

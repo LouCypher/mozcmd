@@ -1,0 +1,23 @@
+/*
+ *  This Source Code Form is subject to the terms of the Mozilla Public
+ *  License, v. 2.0. If a copy of the MPL was not distributed with this
+ *  file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ *
+ *  Contributor(s):
+ *  - LouCypher (original code)
+ */
+
+[
+  {
+    name: "chkupd",
+    description: "Check " + Application.name + " for updates.",
+    exec: function(args, context) {
+      let um = Cc['@mozilla.org/updates/update-manager;1'].getService(Ci.nsIUpdateManager);
+      let prompter = Cc['@mozilla.org/updates/update-prompt;1'].createInstance(Ci.nsIUpdatePrompt);
+      if (um.activeUpdate && um.activeUpdate.state === "pending")
+        prompter.showUpdateDownloaded(um.activeUpdate);
+      else
+        prompter.checkForUpdates();
+    }
+  }
+]

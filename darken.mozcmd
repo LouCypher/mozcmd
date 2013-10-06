@@ -8,7 +8,7 @@
  */
 
 /*
-    Style based on 'Global - Pseudo Brightness Control' userstyle
+    Based on 'Global - Pseudo Brightness Control' userstyle
     http://userstyles.org/styles/45663
     by luckymouse
     http://userstyles.org/users/14255
@@ -41,7 +41,8 @@
       else
         opacity = (100 - darkLevel) / 100;
 
-      let browser = document.getElementById("browser");
+      let browser = context.environment.chromeDocument.getElementById("browser"),
+         gBrowser = context.environment.chromeWindow.gBrowser;
       if (opacity === 1 || gBrowser.style.opacity === opacity.toString()) {
         browser.style.backgroundColor = "";
         gBrowser.style.opacity = "";

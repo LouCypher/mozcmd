@@ -10,36 +10,54 @@
 [
   {
     name: "winsize",
-    description: "Resize browser window. If no parameters entered, display window size.",
+    description: "Resize browser window. If no parameters entered, display current window size.",
     params: [
       {
         name: "width",
         type: "number",
         defaultValue: null,
-        description: "Browser width",
+        description: "Browser width"
       },
       {
         name: "height",
         type: "number",
         defaultValue: null,
-        description: "Browser height",
+        description: "Browser height"
+      },
+      {
+        name: "center",
+        type: "boolean",
+        description: "Center window on screen"
       }
     ],
     returnType: "string",
     exec: function(args, context) {
-      let width = args.width;
-      let height = args.height;
+      let window = context.environment.chromeWindow;
+      let document = context.environment.chromeDocument;
+      let browserWin = document.documentElement;
+      let screen = window.screen;
+
+      function centerScreen() {
+        window.moveTo((screen.availWidth  - browserWin.width)  / 2,
+                      (screen.availHeight - browserWin.height) / 2);
+      }
+
+      let width = args.width, height = args.height, center = args.center;
       if (width && height) {
-        resizeTo(width, height);
+        window.resizeTo(width, height);
+        if (center)
+          centerScreen();
         return "Resized to " + width + "x" + height;
       }
 
-      let win = document.documentElement;
-      switch (windowState) {
+      if (center)
+        centerScreen();
+
+      switch (window.windowState) {
         case 3: // normal
-          return win.width + "x" + win.height;
+          return browserWin.width + "x" + browserWin.height;
         case 1: // maximized
-          return win.clientWidth + "x" + win.clientHeight;
+          return browserWin.clientWidth + "x" + browserWin.clientHeight;
       }
     }
   }

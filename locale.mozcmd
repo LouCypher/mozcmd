@@ -10,25 +10,34 @@
 [
   {
     name: "locale",
-    description: "Change browser locale.",
+    description: "Change browser language.",
     params: [
       {
         name: "langID",
         type: "string",
         defaultValue: null,
-        description: "Language ID.\nUse empty string to use default locale."
+        description: "Language ID. Enter `locale default` to use default locale."
       }
     ],
     returnType: "string",
     exec: function(args, context) {
       let prefname = "general.useragent.locale";
       let prefs = Services.prefs;
-      if (args.langID)
-        prefs.setCharPref(prefname, args.langID);
-      else
-        prefs.clearUserPref(prefname);
-
-      return prefs.getCharPref(prefname);
+      let msgPrefix = "Browser language: '";
+      let msgSuffix = "'";
+      let lang = args.langID;
+      if (lang) {
+        switch (lang) {
+          case "default":
+            prefs.clearUserPref(prefname);
+            msgSuffix = "' (default)";
+            break;
+          default:
+            prefs.setCharPref(prefname, args.langID);
+        }
+        msgPrefix = "Browser language changed to '";
+      }
+      return msgPrefix + prefs.getCharPref(prefname) + msgSuffix;
     }
   }
 ]

@@ -15,29 +15,33 @@
       {
         name: "domain",
         type: "string",
-        defaultValue: "",
+        defaultValue: null,
         description: "Domain name to lookup. If no domain specified, lookup current web site."
       }
     ],
     returnType: "string",
     exec: function(args, context) {
+      let content = context.environment.window;
+      let window = context.environment.chromeWindow;
+
       let hostname;
-      if (args.domain === "")
+      if (!args.domain)
         hostname = content.location.hostname;
       else
         hostname = args.domain;
-      if (hostname === "") {
+
+      if (!hostname) {
         return content.location.protocol + " scheme is not supported.";
       }
 
       let eTLDsvc = Services.eTLD;
-      let eTLD, URI = makeURI("http://" + hostname);
+      let eTLD, URI = Services.io.newURI("http://" + hostname, null, null);
       try {
         eTLD = eTLDsvc.getBaseDomain(URI);
       } catch (ex) {
         eTLD = URI.asciiHost;
       }
-      switchToTabHavingURI("http://whois.domaintools.com/" + eTLD, true);
+      window.switchToTabHavingURI("http://whois.domaintools.com/" + eTLD, true);
       //return eTLD;
     }
   }

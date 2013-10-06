@@ -1,0 +1,36 @@
+/*
+ *  This Source Code Form is subject to the terms of the Mozilla Public
+ *  License, v. 2.0. If a copy of the MPL was not distributed with this
+ *  file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ *
+ *  Contributor(s):
+ *  - LouCypher (original code)
+ */
+
+[
+  {
+    name: "vs",
+    description: "View HTML source of current document or a specified URL.",
+    params: [
+      {
+        name: "url",
+        type: "string",
+        defaultValue: null,
+        description: "Web page URL to view its source. If no URL is entered,\
+                      view source of current document."
+      }
+    ],
+    exec: function(args, context) {
+      let url;
+      if (args.url)
+        url = args.url;
+      else
+        url = context.environment.document.URL;
+
+      if (!/^[a-z0-9]+:/i.test(url))
+        url = "http://" + url;  // Use 'http' by default
+
+      context.environment.chromeWindow.switchToTabHavingURI("view-source:" + url, true);
+    }
+  }
+]

@@ -8,8 +8,7 @@
       // @url       https://github.com/auchenberg/css-reloader
       // @license   Creative Commons Attribution 3.0 Unported License
 
-      // `context.environtment.contentDocument` didn't work, so I'm using `content.document`
-      let elements = content.document.querySelectorAll("link[rel=stylesheet][href]");
+      let elements = context.environment.document.querySelectorAll("link[rel=stylesheet][href]");
       for (let i = 0; i < elements.length; i++) {
         let element = elements[i];
         let h = element.href.replace(/[?&]cssReloader=([^&$]*)/, "");

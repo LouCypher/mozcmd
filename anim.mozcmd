@@ -15,7 +15,7 @@
       {
         name: "mode",
         type: "string",
-        defaultValue: "",
+        defaultValue: null,
         description: "Animation mode (normal, once or none)."
       }
     ],
