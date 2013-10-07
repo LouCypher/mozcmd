@@ -7,16 +7,22 @@
  *  - LouCypher (original code)
  */
 
-
 const { classes: Cc, interfaces: Ci, utils: Cu } = Components;
 
-Cu.import("resource://gre/modules/AddonManager.jsm");
-Cu.import("resource://gre/modules/Services.jsm");
 Cu.import("resource:///modules/devtools/gcli.jsm");
+Cu.import("resource://gre/modules/Services.jsm");
 
-function startup(data, reason) {
-  // anim
-  gcli.addCommand({
+/** unused for now
+Cu.import("resource://gre/modules/AddonManager.jsm");
+Cu.import("resource://gre/modules/FileUtils.jsm");
+Cu.import("resource://gre/modules/NetUtil.jsm");
+Cu.import("resource://gre/modules/PlacesUtils.jsm");
+Cu.import("resource://gre/modules/PrivateBrowsingUtils.jsm");
+var Application = Cc["@mozilla.org/fuel/application;1"].getService(Ci.fuelIApplication);
+**/
+
+var mozcmd = {
+  anim: {
     name: "anim",
     description: "Change image animation mode.",
     params: [
@@ -36,10 +42,9 @@ function startup(data, reason) {
       prefs.setCharPref(prefname, args.mode);
       return "Animation mode is set to '" + prefs.getCharPref(prefname) + "'";
     }
-  })
+  },
 
-  // check for updates
-  gcli.addCommand({
+  chkupd: { // check for updates
     name: "chkupd",
     description: "Check " + Services.appinfo.name + " for updates.",
     exec: function(args, context) {
@@ -50,10 +55,9 @@ function startup(data, reason) {
       else
         prompter.checkForUpdates();
     }
-  })
+  },
 
-  // cssreload
-  gcli.addCommand({
+  cssreload: {  // CSS reload
     name: "cssreload",
     description: "Reload CSS on current page.",
     exec: function(args, context) {
@@ -70,9 +74,9 @@ function startup(data, reason) {
         element.href = h + (h.indexOf("?") >= 0 ? "&" : "?") + "cssReloader=" + (new Date().valueOf());
       }
     }
-  })
+  },
 
-  // darken
+  darken: {
   /*
       Based on 'Global - Pseudo Brightness Control' userstyle
       http://userstyles.org/styles/45663
@@ -81,8 +85,6 @@ function startup(data, reason) {
       License under Public Domain Dedication 
       http://creativecommons.org/publicdomain/zero/1.0/
   */
-
-  gcli.addCommand({
     name: "darken",
     description: "Darken content area.",
     params: [
@@ -119,10 +121,9 @@ function startup(data, reason) {
         gBrowser.style.opacity = opacity;
       }
     }
-  })
+  },
 
-  // escape
-  gcli.addCommand({
+  escape: {
     name: "escape",
     description: "Escape string and copy the result to clipboard.",
     params: [
@@ -145,10 +146,9 @@ function startup(data, reason) {
       clipboardHelper.copyString(escaped);
       return escaped;
     }
-  })
+  },
 
-  // unescape
-  gcli.addCommand({
+  unescape: {
     name: "unescape",
     description: "Unescape string and copy the result to clipboard.",
     params: [
@@ -167,10 +167,9 @@ function startup(data, reason) {
       clipboardHelper.copyString(unescaped);
       return unescaped;
     }
-  })
+  },
 
-  // JS Enabled
-  gcli.addCommand({
+  jsenabled: {
     name: "jsenabled",
     description: "Toggle enable/disable JavaScript.",
     params: [
@@ -191,10 +190,9 @@ function startup(data, reason) {
         win.location.reload();
       return "JavaScript is " + (!jsEnabled ? "enabled" : "disabled") + ".";
     }
-  })
+  },
 
-  // locale
-  gcli.addCommand({
+  locale: {
     name: "locale",
     description: "Change browser language.",
     params: [
@@ -233,10 +231,9 @@ function startup(data, reason) {
       }
       return msgPrefix + prefs.getCharPref(prefname) + msgSuffix;
     }
-  })
+  },
 
-  // view source
-  gcli.addCommand({
+  vs: { // view source
     name: "vs",
     description: "View HTML source of current page or a specified URL.",
     params: [
@@ -264,10 +261,9 @@ function startup(data, reason) {
 
       chromeWindow.switchToTabHavingURI("view-source:" + url, true);
     }
-  })
+  },
 
-  // view rendered source
-  gcli.addCommand({
+  vrs: {  // view rendered source
     name: "vrs",
     description: "View rendered source of current page.",
     exec: function(args, context) {
@@ -290,10 +286,9 @@ function startup(data, reason) {
                   + encodeURIComponent(source);
       chromeWindow.switchToTabHavingURI("view-source:" + dataURI, true);
     }
-  })
+  },
 
-  // whois
-  gcli.addCommand({
+  whois: {
     name: "whois",
     description: "Whois lookup using DomainTools web service.",
     params: [
@@ -330,10 +325,9 @@ function startup(data, reason) {
       window.switchToTabHavingURI("http://whois.domaintools.com/" + eTLD, true);
       //return eTLD;
     }
-  })
+  },
 
-  // winsize
-  gcli.addCommand({
+  winsize: {
     name: "winsize",
     description: "Resize browser window. If no parameters entered, display current window size.",
     params: [
@@ -386,15 +380,17 @@ function startup(data, reason) {
           return browserWin.clientWidth + "x" + browserWin.clientHeight;
       }
     }
-  })
+  }
+}
+
+function startup(data, reason) {
+  for (var i in mozcmd)
+    gcli.addCommand(mozcmd[i]);
 }
 
 function shutdown(data, reason) {
-  ["anim", "chkupd", "cssreload", "darken", "escape", "unescape",
-   "jsenabled", "locale", "vs", "vrs", "whois", "winsize"].
-  forEach(function(cmd) {
-    gcli.removeCommand(cmd);
-  })
+  for (var i in mozcmd)
+    gcli.removeCommand(mozcmd[i]);
 }
 
 function install(data, reason) {

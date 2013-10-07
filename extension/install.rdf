@@ -6,7 +6,7 @@
     <em:type>2</em:type>
     <em:bootstrap>true</em:bootstrap>
     <em:name>mozcmd</em:name><!-- Temporary name -->
-    <em:version>0.2</em:version>
+    <em:version>0.2.1</em:version>
     <em:description>Add more commands for Developer Toolbar (GCLI).</em:description>
     <em:creator>LouCypher</em:creator>
     <em:homepageURL>https://github.com/LouCypher/mozcmd</em:homepageURL>
