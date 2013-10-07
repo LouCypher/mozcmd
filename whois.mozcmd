@@ -21,8 +21,9 @@
     ],
     returnType: "string",
     exec: function(args, context) {
-      let content = context.environment.window;
-      let window = context.environment.chromeWindow;
+      let environment = context.environment;
+      let content = environment.window || environment.contentDocument.defaultView;
+      let window = environment.chromeWindow || environment.chromeDocument.defaultView;
 
       let hostname;
       if (!args.domain)

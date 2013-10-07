@@ -21,16 +21,20 @@
       }
     ],
     exec: function(args, context) {
+      let environment = context.environment;
+      let document = environment.document || environment.contentDocument;
+      let chromeWindow = environment.chromeWindow || environment.chromeDocument.defaultView;
+
       let url;
       if (args.url)
         url = args.url;
       else
-        url = context.environment.document.URL;
+        url = document.URL;
 
       if (!/^[a-z0-9]+:/i.test(url))
         url = "http://" + url;  // Use 'http' by default
 
-      context.environment.chromeWindow.switchToTabHavingURI("view-source:" + url, true);
+      chromeWindow.switchToTabHavingURI("view-source:" + url, true);
     }
   },
 
@@ -38,7 +42,10 @@
     name: "vrs",
     description: "View rendered source of current page.",
     exec: function(args, context) {
-      let document = context.environment.document;
+      let environment = context.environment;
+      let document = environment.document || environment.contentDocument;
+      let chromeWindow = environment.chromeWindow || environment.chromeDocument.defaultView;
+
       let doctypeElem = "";
       let doctype = document.doctype;
       if (doctype) {
@@ -52,7 +59,7 @@
       let contentType = isHTML ? "text/html" : "application/xml";
       let dataURI = "data:" + contentType + ";charset=utf-8" + ","
                   + encodeURIComponent(source);
-      context.environment.chromeWindow.switchToTabHavingURI("view-source:" + dataURI, true);
+      chromeWindow.switchToTabHavingURI("view-source:" + dataURI, true);
     }
   }
 ]

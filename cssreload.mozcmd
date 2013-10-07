@@ -8,7 +8,8 @@
       // @url       https://github.com/auchenberg/css-reloader
       // @license   Creative Commons Attribution 3.0 Unported License
 
-      let elements = context.environment.document.querySelectorAll("link[rel=stylesheet][href]");
+      let document = context.environment.document || context.environment.contentDocument;
+      let elements = document.querySelectorAll("link[rel=stylesheet][href]");
       for (let i = 0; i < elements.length; i++) {
         let element = elements[i];
         let h = element.href.replace(/[?&]cssReloader=([^&$]*)/, "");

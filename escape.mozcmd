@@ -21,9 +21,10 @@
     ],
     returnType: "string",
     exec: function(args, context) {
+      let win = context.environment.window || context.environment.contentDocument.defaultView;
       let string = args.string;
       if (!string)
-        string = context.environment.window.location.href;
+        string = win.location.href;
       let escaped = encodeURIComponent(string);
       let clipboardHelper = Cc["@mozilla.org/widget/clipboardhelper;1"].
                             getService(Ci.nsIClipboardHelper);
@@ -52,5 +53,4 @@
       return unescaped;
     }
   }
-
 ]

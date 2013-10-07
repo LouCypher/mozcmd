@@ -43,8 +43,8 @@
       else
         opacity = (100 - darkLevel) / 100;
 
-      let browser = context.environment.chromeDocument.getElementById("browser"),
-         gBrowser = context.environment.chromeWindow.gBrowser;
+      let browser = context.environment.chromeDocument.getElementById("browser");
+      let gBrowser = context.environment.chromeDocument.getElementById("content");
       if (opacity === 1 || gBrowser.style.opacity === opacity.toString()) {
         browser.style.backgroundColor = "";
         gBrowser.style.opacity = "";

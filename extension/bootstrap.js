@@ -62,7 +62,8 @@ function startup(data, reason) {
       // @url       https://github.com/auchenberg/css-reloader
       // @license   Creative Commons Attribution 3.0 Unported License
 
-      let elements = context.environment.document.querySelectorAll("link[rel=stylesheet][href]");
+      let document = context.environment.document || context.environment.contentDocument;
+      let elements = document.querySelectorAll("link[rel=stylesheet][href]");
       for (let i = 0; i < elements.length; i++) {
         let element = elements[i];
         let h = element.href.replace(/[?&]cssReloader=([^&$]*)/, "");
@@ -97,8 +98,6 @@ function startup(data, reason) {
       }
     ],
     exec: function(args, context) {
-      Services.prefs.clearUserPref("darken.data"); // Remove old prefs
-
       let darkLevel = args["Dark level"];
       if (darkLevel < 0) darkLevel = 0;
       if (darkLevel > 100) darkLevel = 100;
@@ -109,8 +108,8 @@ function startup(data, reason) {
       else
         opacity = (100 - darkLevel) / 100;
 
-      let browser = context.environment.chromeDocument.getElementById("browser"),
-         gBrowser = context.environment.chromeWindow.gBrowser;
+      let browser = context.environment.chromeDocument.getElementById("browser");
+      let gBrowser = context.environment.chromeDocument.getElementById("content");
       if (opacity === 1 || gBrowser.style.opacity === opacity.toString()) {
         browser.style.backgroundColor = "";
         gBrowser.style.opacity = "";
@@ -136,9 +135,10 @@ function startup(data, reason) {
     ],
     returnType: "string",
     exec: function(args, context) {
+      let win = context.environment.window || context.environment.contentDocument.defaultView;
       let string = args.string;
       if (!string)
-        string = context.environment.window.location.href;
+        string = win.location.href;
       let escaped = encodeURIComponent(string);
       let clipboardHelper = Cc["@mozilla.org/widget/clipboardhelper;1"].
                             getService(Ci.nsIClipboardHelper);
@@ -182,12 +182,13 @@ function startup(data, reason) {
     ],
     returnType: "string",
     exec: function(args, context) {
+      let win = context.environment.window || context.environment.contentDocument.defaultView;
       let prefname = "javascript.enabled";
       let prefs = Services.prefs;
       let jsEnabled = prefs.getBoolPref(prefname);
       prefs.setBoolPref(prefname, !jsEnabled);
       if (args.reload)
-        context.environment.window.location.reload();
+        win.location.reload();
       return "JavaScript is " + (!jsEnabled ? "enabled" : "disabled") + ".";
     }
   })
@@ -237,27 +238,31 @@ function startup(data, reason) {
   // view source
   gcli.addCommand({
     name: "vs",
-    description: "View HTML source of current document or a specified URL.",
+    description: "View HTML source of current page or a specified URL.",
     params: [
       {
         name: "url",
         type: "string",
         defaultValue: null,
         description: "Web page URL to view its source. If no URL is entered,\
-                      view source of current document."
+                      view source of current page."
       }
     ],
     exec: function(args, context) {
+      let environment = context.environment;
+      let document = environment.document || environment.contentDocument;
+      let chromeWindow = environment.chromeWindow || environment.chromeDocument.defaultView;
+
       let url;
       if (args.url)
         url = args.url;
       else
-        url = context.environment.document.URL;
+        url = document.URL;
 
       if (!/^[a-z0-9]+:/i.test(url))
         url = "http://" + url;  // Use 'http' by default
 
-      context.environment.chromeWindow.switchToTabHavingURI("view-source:" + url, true);
+      chromeWindow.switchToTabHavingURI("view-source:" + url, true);
     }
   })
 
@@ -266,7 +271,10 @@ function startup(data, reason) {
     name: "vrs",
     description: "View rendered source of current page.",
     exec: function(args, context) {
-      let document = context.environment.document;
+      let environment = context.environment;
+      let document = environment.document || environment.contentDocument;
+      let chromeWindow = environment.chromeWindow || environment.chromeDocument.defaultView;
+
       let doctypeElem = "";
       let doctype = document.doctype;
       if (doctype) {
@@ -280,7 +288,7 @@ function startup(data, reason) {
       let contentType = isHTML ? "text/html" : "application/xml";
       let dataURI = "data:" + contentType + ";charset=utf-8" + ","
                   + encodeURIComponent(source);
-      context.environment.chromeWindow.switchToTabHavingURI("view-source:" + dataURI, true);
+      chromeWindow.switchToTabHavingURI("view-source:" + dataURI, true);
     }
   })
 
@@ -298,8 +306,9 @@ function startup(data, reason) {
     ],
     returnType: "string",
     exec: function(args, context) {
-      let content = context.environment.window;
-      let window = context.environment.chromeWindow;
+      let environment = context.environment;
+      let content = environment.window || environment.contentDocument.defaultView;
+      let window = environment.chromeWindow || environment.chromeDocument.defaultView;
 
       let hostname;
       if (!args.domain)
@@ -348,8 +357,9 @@ function startup(data, reason) {
     ],
     returnType: "string",
     exec: function(args, context) {
-      let window = context.environment.chromeWindow;
-      let document = context.environment.chromeDocument;
+      let environment = context.environment;
+      let window = environment.chromeWindow || environment.chromeDocument.defaultView;
+      let document = environment.chromeDocument;
       let browserWin = document.documentElement;
       let screen = window.screen;
 

@@ -32,8 +32,9 @@
     ],
     returnType: "string",
     exec: function(args, context) {
-      let window = context.environment.chromeWindow;
-      let document = context.environment.chromeDocument;
+      let environment = context.environment;
+      let window = environment.chromeWindow || environment.chromeDocument.defaultView;
+      let document = environment.chromeDocument;
       let browserWin = document.documentElement;
       let screen = window.screen;
 
