@@ -10,14 +10,14 @@
 [
   {
     name: "vs",
-    description: "View HTML source of current document or a specified URL.",
+    description: "View HTML source of current page or a specified URL.",
     params: [
       {
         name: "url",
         type: "string",
         defaultValue: null,
         description: "Web page URL to view its source. If no URL is entered,\
-                      view source of current document."
+                      view source of current page."
       }
     ],
     exec: function(args, context) {
@@ -31,6 +31,28 @@
         url = "http://" + url;  // Use 'http' by default
 
       context.environment.chromeWindow.switchToTabHavingURI("view-source:" + url, true);
+    }
+  },
+
+  {
+    name: "vrs",
+    description: "View rendered source of current page.",
+    exec: function(args, context) {
+      let document = context.environment.document;
+      let doctypeElem = "";
+      let doctype = document.doctype;
+      if (doctype) {
+        doctypeElem += "<!DOCTYPE " + doctype.name;
+        doctypeElem += doctype.publicId ? (' PUBLIC "' + doctype.publicId + '"') : "";
+        doctypeElem += doctype.systemId ? (' "' + doctype.systemId + '"') : "";
+        doctypeElem += ">\n";
+      }
+      let source = doctypeElem + document.documentElement.outerHTML;
+      let isHTML = document.createElement("div").tagName === "DIV";
+      let contentType = isHTML ? "text/html" : "application/xml";
+      let dataURI = "data:" + contentType + ";charset=utf-8" + ","
+                  + encodeURIComponent(source);
+      context.environment.chromeWindow.switchToTabHavingURI("view-source:" + dataURI, true);
     }
   }
 ]

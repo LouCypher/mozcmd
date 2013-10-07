@@ -253,6 +253,29 @@ function startup(data, reason) {
     }
   })
 
+  // view rendered source
+  gcli.addCommand({
+    name: "vrs",
+    description: "View rendered source of current page.",
+    exec: function(args, context) {
+      let document = context.environment.document;
+      let doctypeElem = "";
+      let doctype = document.doctype;
+      if (doctype) {
+        doctypeElem += "<!DOCTYPE " + doctype.name;
+        doctypeElem += doctype.publicId ? (' PUBLIC "' + doctype.publicId + '"') : "";
+        doctypeElem += doctype.systemId ? (' "' + doctype.systemId + '"') : "";
+        doctypeElem += ">\n";
+      }
+      let source = doctypeElem + document.documentElement.outerHTML;
+      let isHTML = document.createElement("div").tagName === "DIV";
+      let contentType = isHTML ? "text/html" : "application/xml";
+      let dataURI = "data:" + contentType + ";charset=utf-8" + ","
+                  + encodeURIComponent(source);
+      context.environment.chromeWindow.switchToTabHavingURI("view-source:" + dataURI, true);
+    }
+  })
+
   // whois
   gcli.addCommand({
     name: "whois",
@@ -350,7 +373,7 @@ function startup(data, reason) {
 
 function shutdown(data, reason) {
   ["anim", "chkupd", "cssreload", "darken", "escape", "unescape",
-   "jsenabled", "locale", "vs", "whois", "winsize"].
+   "jsenabled", "locale", "vs", "vrs", "whois", "winsize"].
   forEach(function(cmd) {
     gcli.removeCommand(cmd);
   })
