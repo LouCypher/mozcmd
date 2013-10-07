@@ -349,8 +349,8 @@ function startup(data, reason) {
 }
 
 function shutdown(data, reason) {
-  ["anim", "cssreload", "chkupd", "darken", "escape", "jsenabled",
-   "locale", "unescape", "vs", "whois", "winsize"].
+  ["anim", "chkupd", "cssreload", "darken", "escape", "unescape",
+   "jsenabled", "locale", "vs", "whois", "winsize"].
   forEach(function(cmd) {
     gcli.removeCommand(cmd);
   })

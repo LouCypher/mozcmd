@@ -9,6 +9,28 @@
     <em:version>0.1</em:version>
     <em:description>Add more commands for Developer Toolbar (GCLI).</em:description>
     <em:creator>LouCypher</em:creator>
+    <em:homepageURL>https://github.com/LouCypher/mozcmd</em:homepageURL>
+
+    <em:localized>
+      <Description>
+        <em:locale>en-US</em:locale>
+        <em:name>mozcmd</em:name><!-- Temporary name -->
+        <em:description>Add more commands for Developer Toolbar (GCLI).</em:description>
+        <em:creator>LouCypher</em:creator>
+        <em:homepageURL>https://github.com/LouCypher/mozcmd</em:homepageURL>
+      </Description>
+    </em:localized>
+
+    <em:localized>
+      <Description>
+        <em:locale>id</em:locale>
+        <em:name>mozcmd</em:name><!-- Nama sementara -->
+        <em:description>Menambahkan beberapa perintah untuk Bilah Alat Pengembang (GCLI).</em:description>
+        <em:creator>LouCypher</em:creator>
+        <em:homepageURL>https://github.com/LouCypher/mozcmd</em:homepageURL>
+      </Description>
+    </em:localized>
+
     <em:targetApplication>
       <Description><!--Firefox-->
         <em:id>{ec8030f7-c20a-464f-9b0e-13a3a9e97384}</em:id>
