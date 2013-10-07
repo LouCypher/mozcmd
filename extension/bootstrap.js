@@ -206,7 +206,15 @@ function startup(data, reason) {
     ],
     returnType: "string",
     exec: function(args, context) {
-      let prefname = "general.useragent.locale";
+      let prefname = "general.useragent.locale";  // See AMO warning below
+      /*
+        AMO warning from add-on validator:
+        ---
+        Potentially unsafe preference branch referenced
+        Warning: Extensions should not alter preferences in this preference branch
+        ---
+        I couldn't find another way to change browser locale without using preferences
+      */
       let prefs = Services.prefs;
       let msgPrefix = "Browser language: '";
       let msgSuffix = "'";
