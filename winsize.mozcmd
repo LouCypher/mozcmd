@@ -33,19 +33,19 @@
     returnType: "string",
     exec: function(args, context) {
       let environment = context.environment;
-      let window = environment.chromeWindow || environment.chromeDocument.defaultView;
-      let document = environment.chromeDocument;
-      let browserWin = document.documentElement;
-      let screen = window.screen;
+      let chromeWin = environment.chromeWindow || environment.chromeDocument.defaultView;
+      let chromeDoc = environment.chromeDocument;
+      let browserWin = chromeDoc.documentElement;
+      let screen = chromeWin.screen;
 
       function centerScreen() {
-        window.moveTo((screen.availWidth  - browserWin.width)  / 2,
-                      (screen.availHeight - browserWin.height) / 2);
+        chromeWin.moveTo((screen.availWidth  - browserWin.width)  / 2,
+                         (screen.availHeight - browserWin.height) / 2);
       }
 
       let width = args.width, height = args.height, center = args.center;
       if (width && height) {
-        window.resizeTo(width, height);
+        chromeWin.resizeTo(width, height);
         if (center)
           centerScreen();
         return "Resized to " + width + "x" + height;
@@ -54,7 +54,7 @@
       if (center)
         centerScreen();
 
-      switch (window.windowState) {
+      switch (chromeWin.windowState) {
         case 3: // normal
           return browserWin.width + "x" + browserWin.height;
         case 1: // maximized

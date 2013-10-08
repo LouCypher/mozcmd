@@ -20,13 +20,13 @@
     ],
     returnType: "string",
     exec: function(args, context) {
-      let win = context.environment.window || context.environment.contentDocument.defaultView;
+      let contentWin = context.environment.window || context.environment.contentDocument.defaultView;
       let prefname = "javascript.enabled";
       let prefs = Services.prefs;
       let jsEnabled = prefs.getBoolPref(prefname);
       prefs.setBoolPref(prefname, !jsEnabled);
       if (args.reload)
-        win.location.reload();
+        contentWin.location.reload();
       return "JavaScript is " + (!jsEnabled ? "enabled" : "disabled") + ".";
     }
   }

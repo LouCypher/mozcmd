@@ -22,19 +22,19 @@
     ],
     exec: function(args, context) {
       let environment = context.environment;
-      let document = environment.document || environment.contentDocument;
-      let chromeWindow = environment.chromeWindow || environment.chromeDocument.defaultView;
+      let contentDoc = environment.document || environment.contentDocument;
+      let chromeWin = environment.chromeWindow || environment.chromeDocument.defaultView;
 
       let url;
       if (args.url)
         url = args.url;
       else
-        url = document.URL;
+        url = contentDoc.location.href;
 
       if (!/^[a-z0-9]+:/i.test(url))
         url = "http://" + url;  // Use 'http' by default
 
-      chromeWindow.switchToTabHavingURI("view-source:" + url, true);
+      chromeWin.switchToTabHavingURI("view-source:" + url, true);
     }
   },
 
@@ -43,23 +43,17 @@
     description: "View rendered source of current page.",
     exec: function(args, context) {
       let environment = context.environment;
-      let document = environment.document || environment.contentDocument;
-      let chromeWindow = environment.chromeWindow || environment.chromeDocument.defaultView;
+      let contentDoc = environment.document || environment.contentDocument;
+      let chromeWin = environment.chromeWindow || environment.chromeDocument.defaultView;
 
-      let doctypeElem = "";
-      let doctype = document.doctype;
-      if (doctype) {
-        doctypeElem += "<!DOCTYPE " + doctype.name;
-        doctypeElem += doctype.publicId ? (' PUBLIC "' + doctype.publicId + '"') : "";
-        doctypeElem += doctype.systemId ? (' "' + doctype.systemId + '"') : "";
-        doctypeElem += ">\n";
-      }
-      let source = doctypeElem + document.documentElement.outerHTML;
-      let isHTML = document.createElement("div").tagName === "DIV";
+      let domSerializer = Cc["@mozilla.org/xmlextras/xmlserializer;1"].
+                          createInstance(Ci.nsIDOMSerializer);
+      let source = domSerializer.serializeToString(contentDoc);
+      let isHTML = contentDoc.createElement("div").tagName === "DIV";
       let contentType = isHTML ? "text/html" : "application/xml";
       let dataURI = "data:" + contentType + ";charset=utf-8" + ","
                   + encodeURIComponent(source);
-      chromeWindow.switchToTabHavingURI("view-source:" + dataURI, true);
+      chromeWin.switchToTabHavingURI("view-source:" + dataURI, true);
     }
   }
 ]

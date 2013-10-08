@@ -19,20 +19,20 @@
         description: "Domain name to lookup. If no domain specified, lookup current web site."
       }
     ],
-    returnType: "string",
+    //returnType: "string",
     exec: function(args, context) {
       let environment = context.environment;
-      let content = environment.window || environment.contentDocument.defaultView;
-      let window = environment.chromeWindow || environment.chromeDocument.defaultView;
+      let contentWin = environment.window || environment.contentDocument.defaultView;
+      let chromeWin = environment.chromeWindow || environment.chromeDocument.defaultView;
 
       let hostname;
       if (!args.domain)
-        hostname = content.location.hostname;
+        hostname = contentWin.location.hostname;
       else
         hostname = args.domain;
 
       if (!hostname) {
-        return content.location.protocol + " scheme is not supported.";
+        return contentWin.location.protocol + " scheme is not supported.";
       }
 
       let eTLDsvc = Services.eTLD;
@@ -42,7 +42,7 @@
       } catch (ex) {
         eTLD = URI.asciiHost;
       }
-      window.switchToTabHavingURI("http://whois.domaintools.com/" + eTLD, true);
+      chromeWin.switchToTabHavingURI("http://whois.domaintools.com/" + eTLD, true);
       //return eTLD;
     }
   }

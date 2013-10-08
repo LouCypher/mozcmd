@@ -12,7 +12,7 @@ const { classes: Cc, interfaces: Ci, utils: Cu } = Components;
 Cu.import("resource:///modules/devtools/gcli.jsm");
 Cu.import("resource://gre/modules/Services.jsm");
 
-/** unused for now
+/** for future use
 Cu.import("resource://gre/modules/AddonManager.jsm");
 Cu.import("resource://gre/modules/FileUtils.jsm");
 Cu.import("resource://gre/modules/NetUtil.jsm");
@@ -66,8 +66,8 @@ var mozcmd = {
       // @url       https://github.com/auchenberg/css-reloader
       // @license   Creative Commons Attribution 3.0 Unported License
 
-      let document = context.environment.document || context.environment.contentDocument;
-      let elements = document.querySelectorAll("link[rel=stylesheet][href]");
+      let contentDoc = context.environment.document || context.environment.contentDocument;
+      let elements = contentDoc.querySelectorAll("link[rel=stylesheet][href]");
       for (let i = 0; i < elements.length; i++) {
         let element = elements[i];
         let h = element.href.replace(/[?&]cssReloader=([^&$]*)/, "");
@@ -136,10 +136,10 @@ var mozcmd = {
     ],
     returnType: "string",
     exec: function(args, context) {
-      let win = context.environment.window || context.environment.contentDocument.defaultView;
+      let contentWin = context.environment.window || context.environment.contentDocument.defaultView;
       let string = args.string;
       if (!string)
-        string = win.location.href;
+        string = contentWin.location.href;
       let escaped = encodeURIComponent(string);
       let clipboardHelper = Cc["@mozilla.org/widget/clipboardhelper;1"].
                             getService(Ci.nsIClipboardHelper);
@@ -181,13 +181,13 @@ var mozcmd = {
     ],
     returnType: "string",
     exec: function(args, context) {
-      let win = context.environment.window || context.environment.contentDocument.defaultView;
+      let contentWin = context.environment.window || context.environment.contentDocument.defaultView;
       let prefname = "javascript.enabled";
       let prefs = Services.prefs;
       let jsEnabled = prefs.getBoolPref(prefname);
       prefs.setBoolPref(prefname, !jsEnabled);
       if (args.reload)
-        win.location.reload();
+        contentWin.location.reload();
       return "JavaScript is " + (!jsEnabled ? "enabled" : "disabled") + ".";
     }
   },
@@ -247,19 +247,19 @@ var mozcmd = {
     ],
     exec: function(args, context) {
       let environment = context.environment;
-      let document = environment.document || environment.contentDocument;
-      let chromeWindow = environment.chromeWindow || environment.chromeDocument.defaultView;
+      let contentDoc = environment.document || environment.contentDocument;
+      let chromeWin = environment.chromeWindow || environment.chromeDocument.defaultView;
 
       let url;
       if (args.url)
         url = args.url;
       else
-        url = document.URL;
+        url = contentDoc.location.href;
 
       if (!/^[a-z0-9]+:/i.test(url))
         url = "http://" + url;  // Use 'http' by default
 
-      chromeWindow.switchToTabHavingURI("view-source:" + url, true);
+      chromeWin.switchToTabHavingURI("view-source:" + url, true);
     }
   },
 
@@ -268,23 +268,17 @@ var mozcmd = {
     description: "View rendered source of current page.",
     exec: function(args, context) {
       let environment = context.environment;
-      let document = environment.document || environment.contentDocument;
-      let chromeWindow = environment.chromeWindow || environment.chromeDocument.defaultView;
+      let contentDoc = environment.document || environment.contentDocument;
+      let chromeWin = environment.chromeWindow || environment.chromeDocument.defaultView;
 
-      let doctypeElem = "";
-      let doctype = document.doctype;
-      if (doctype) {
-        doctypeElem += "<!DOCTYPE " + doctype.name;
-        doctypeElem += doctype.publicId ? (' PUBLIC "' + doctype.publicId + '"') : "";
-        doctypeElem += doctype.systemId ? (' "' + doctype.systemId + '"') : "";
-        doctypeElem += ">\n";
-      }
-      let source = doctypeElem + document.documentElement.outerHTML;
-      let isHTML = document.createElement("div").tagName === "DIV";
+      let domSerializer = Cc["@mozilla.org/xmlextras/xmlserializer;1"].
+                          createInstance(Ci.nsIDOMSerializer);
+      let source = domSerializer.serializeToString(contentDoc);
+      let isHTML = contentDoc.createElement("div").tagName === "DIV";
       let contentType = isHTML ? "text/html" : "application/xml";
       let dataURI = "data:" + contentType + ";charset=utf-8" + ","
                   + encodeURIComponent(source);
-      chromeWindow.switchToTabHavingURI("view-source:" + dataURI, true);
+      chromeWin.switchToTabHavingURI("view-source:" + dataURI, true);
     }
   },
 
@@ -299,20 +293,20 @@ var mozcmd = {
         description: "Domain name to lookup. If no domain specified, lookup current web site."
       }
     ],
-    returnType: "string",
+    //returnType: "string",
     exec: function(args, context) {
       let environment = context.environment;
-      let content = environment.window || environment.contentDocument.defaultView;
-      let window = environment.chromeWindow || environment.chromeDocument.defaultView;
+      let contentWin = environment.window || environment.contentDocument.defaultView;
+      let chromeWin = environment.chromeWindow || environment.chromeDocument.defaultView;
 
       let hostname;
       if (!args.domain)
-        hostname = content.location.hostname;
+        hostname = contentWin.location.hostname;
       else
         hostname = args.domain;
 
       if (!hostname) {
-        return content.location.protocol + " scheme is not supported.";
+        return contentWin.location.protocol + " scheme is not supported.";
       }
 
       let eTLDsvc = Services.eTLD;
@@ -322,7 +316,7 @@ var mozcmd = {
       } catch (ex) {
         eTLD = URI.asciiHost;
       }
-      window.switchToTabHavingURI("http://whois.domaintools.com/" + eTLD, true);
+      chromeWin.switchToTabHavingURI("http://whois.domaintools.com/" + eTLD, true);
       //return eTLD;
     }
   },
@@ -352,19 +346,19 @@ var mozcmd = {
     returnType: "string",
     exec: function(args, context) {
       let environment = context.environment;
-      let window = environment.chromeWindow || environment.chromeDocument.defaultView;
-      let document = environment.chromeDocument;
-      let browserWin = document.documentElement;
-      let screen = window.screen;
+      let chromeWin = environment.chromeWindow || environment.chromeDocument.defaultView;
+      let chromeDoc = environment.chromeDocument;
+      let browserWin = chromeDoc.documentElement;
+      let screen = chromeWin.screen;
 
       function centerScreen() {
-        window.moveTo((screen.availWidth  - browserWin.width)  / 2,
-                      (screen.availHeight - browserWin.height) / 2);
+        chromeWin.moveTo((screen.availWidth  - browserWin.width)  / 2,
+                         (screen.availHeight - browserWin.height) / 2);
       }
 
       let width = args.width, height = args.height, center = args.center;
       if (width && height) {
-        window.resizeTo(width, height);
+        chromeWin.resizeTo(width, height);
         if (center)
           centerScreen();
         return "Resized to " + width + "x" + height;
@@ -373,7 +367,7 @@ var mozcmd = {
       if (center)
         centerScreen();
 
-      switch (window.windowState) {
+      switch (chromeWin.windowState) {
         case 3: // normal
           return browserWin.width + "x" + browserWin.height;
         case 1: // maximized
@@ -384,12 +378,12 @@ var mozcmd = {
 }
 
 function startup(data, reason) {
-  for (var i in mozcmd)
+  for (let i in mozcmd)
     gcli.addCommand(mozcmd[i]);
 }
 
 function shutdown(data, reason) {
-  for (var i in mozcmd)
+  for (let i in mozcmd)
     gcli.removeCommand(mozcmd[i]);
 }
 
