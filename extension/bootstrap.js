@@ -46,76 +46,68 @@ var mozcmd = {
 
   chkupd: { // Check for updates
     name: "chkupd",
-    description: "Check " + Services.appinfo.name + " for updates."
-  },
-
-  // Begin sub-commands for chkupd
-  chkupdUpdate: {  // Check for updates
-    name: "chkupd update",
     description: "Check " + Services.appinfo.name + " for updates.",
-    exec: function(args, context) {
-      let um = Cc['@mozilla.org/updates/update-manager;1'].getService(Ci.nsIUpdateManager);
-      let prompter = Cc['@mozilla.org/updates/update-prompt;1'].createInstance(Ci.nsIUpdatePrompt);
-      if (um.activeUpdate && um.activeUpdate.state === "pending")
-        prompter.showUpdateDownloaded(um.activeUpdate);
-      else
-        prompter.checkForUpdates();
-    }
-  },
-
-  chkupdNotes: {  // Open release notes
-    name: "chkupd notes",
-    description: "Open release notes.",
+    params: [
+      {
+        name: "option",
+        type: "string",
+        defaultValue: null,
+        description: "notes: open release notes; changeset: open changeset;\
+                      history: show update history; no parameter: check for updates"
+      }
+    ],
     returnType: "string",
     exec: function(args, context) {
-      let chromeWin = context.environment.chromeWindow ||
-                      context.environment.chromeDocument.defaultView;
+      function openURL(aURL) {
+        let chromeWin = context.environment.chromeWindow ||
+                        context.environment.chromeDocument.defaultView;
+        chromeWin.switchToTabHavingURI(aURL, true);
+      }
+
       let um = Cc['@mozilla.org/updates/update-manager;1'].getService(Ci.nsIUpdateManager);
-      let relNotesURL;
-      if (um.getUpdateAt(0))
-        relNotesURL = um.getUpdateAt(0).detailsURL;
+      let option = args.option;
 
-      if (!relNotesURL)
-        return "No release notes.";
+      if (option === "notes") {
+        let relNotesURL;
+        if (um.getUpdateAt(0))
+          relNotesURL = um.getUpdateAt(0).detailsURL;
 
-      if (/mozilla.com/.test(relNotesURL))
-        relNotesURL = relNotesURL.replace(/mozilla.com/, "mozilla.org");
-      chromeWin.switchToTabHavingURI(relNotesURL, true);
+        if (!relNotesURL)
+          return "No release notes.";
+
+        if (/mozilla.com/.test(relNotesURL))
+          relNotesURL = relNotesURL.replace(/mozilla.com/, "mozilla.org");
+
+        openURL(relNotesURL);
+      }
+
+      else if (option === "changeset") {
+        let req = Cc["@mozilla.org/xmlextras/xmlhttprequest;1"].createInstance(Ci.nsIXMLHttpRequest);
+        req.open("GET", "about:buildconfig", false);
+        req.send(null);
+        let changeset = req.responseText.match(/http:\/\/hg.mozilla.org\/[^\"]*/);
+        if (!changeset)
+          return "No changeset on this release.";
+        
+        openURL(changeset);
+      }
+
+      else if (option === "history") {
+        if (!um.getUpdateAt(0))
+          return "No updates installed yet.";
+        
+        openURL("chrome://mozapps/content/update/history.xul");
+      }
+
+      else {
+        let prompter = Cc['@mozilla.org/updates/update-prompt;1'].createInstance(Ci.nsIUpdatePrompt);
+        if (um.activeUpdate && um.activeUpdate.state === "pending")
+          prompter.showUpdateDownloaded(um.activeUpdate);
+        else
+          prompter.checkForUpdates();
+      }
     }
   },
-
-  chkupdChangeset: {  // Open changeset
-    name: "chkupd changeset",
-    description: "Open changeset.",
-    exec: function(args, context) {
-      let chromeWin = context.environment.chromeWindow ||
-                      context.environment.chromeDocument.defaultView;
-      let req = Cc["@mozilla.org/xmlextras/xmlhttprequest;1"].createInstance(Ci.nsIXMLHttpRequest);
-      req.open("GET", "about:buildconfig", false);
-      req.send(null);
-      let changeset = req.responseText.match(/http:\/\/hg.mozilla.org\/[^\"]*/);
-      if (!changeset)
-        return "No changeset on this release."
-
-      chromeWin.switchToTabHavingURI(changeset, true);
-    }
-  },
-
-  chkupdHistory: {  // Show update history
-    name: "chkupd history",
-    description: "Show update history.",
-    returnType: "string",
-    exec: function(args, context) {
-      let chromeWin = context.environment.chromeWindow ||
-                      context.environment.chromeDocument.defaultView;
-      let um = Cc['@mozilla.org/updates/update-manager;1'].getService(Ci.nsIUpdateManager);
-      if (!um.getUpdateAt(0))
-        return "No updates installed yet.";
-
-      chromeWin.switchToTabHavingURI("chrome://mozapps/content/update/history.xul", true);
-    }
-  },
-  // End sub-commands for chkupd
 
   cssreload: {  // CSS reload
     name: "cssreload",
