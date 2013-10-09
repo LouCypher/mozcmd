@@ -10,42 +10,73 @@
 [
   {
     name: "chkupd",
+    description: "Check " + Application.name + " for updates."
+  },
+
+  {
+    name: "chkupd update",
     description: "Check " + Application.name + " for updates.",
-    params: [
-      {
-        name: "option",
-        description: "No parameter: check for updates; notes: open release notes;\
-                      history: show update history.",
-        type: {
-          name: "selection",
-          data: ["", "notes", "history"]
-        },
-        defaultValue: null,
-      }
-    ],
     exec: function(args, context) {
-      function openURL(aURL) {
-        let chromeWin = context.environment.chromeWindow ||
-                        context.environment.chromeDocument.defaultView;
-        chromeWin.switchToTabHavingURI(aURL, true);
-      }
-
       let um = Cc['@mozilla.org/updates/update-manager;1'].getService(Ci.nsIUpdateManager);
+      let prompter = Cc['@mozilla.org/updates/update-prompt;1'].createInstance(Ci.nsIUpdatePrompt);
+      if (um.activeUpdate && um.activeUpdate.state === "pending")
+        prompter.showUpdateDownloaded(um.activeUpdate);
+      else
+        prompter.checkForUpdates();
+    }
+  },
 
-      let param = args.option;
-      if (param === "notes") {
-        openURL(um.getUpdateAt(0).detailsURL);
-      }
-      else if (param === "history") {
-        openURL("chrome://mozapps/content/update/history.xul");
-      }
-      else {
-        let prompter = Cc['@mozilla.org/updates/update-prompt;1'].createInstance(Ci.nsIUpdatePrompt);
-        if (um.activeUpdate && um.activeUpdate.state === "pending")
-          prompter.showUpdateDownloaded(um.activeUpdate);
-        else
-          prompter.checkForUpdates();
-      }
+  {
+    name: "chkupd notes",
+    description: "Open release notes.",
+    returnType: "string",
+    exec: function(args, context) {
+      let chromeWin = context.environment.chromeWindow ||
+                      context.environment.chromeDocument.defaultView;
+      let um = Cc['@mozilla.org/updates/update-manager;1'].getService(Ci.nsIUpdateManager);
+      let relNotesURL;
+      if (um.getUpdateAt(0))
+        relNotesURL = um.getUpdateAt(0).detailsURL;
+
+      if (!relNotesURL)
+        return "No release notes.";
+
+      if (/mozilla.com/.test(relNotesURL))
+        relNotesURL = relNotesURL.replace(/mozilla.com/, "mozilla.org");
+      chromeWin.switchToTabHavingURI(relNotesURL, true);
+    }
+  },
+
+  {
+    name: "chkupd changeset",
+    description: "Open changeset.",
+    returnType: "string",
+    exec: function(args, context) {
+      let chromeWin = context.environment.chromeWindow ||
+                      context.environment.chromeDocument.defaultView;
+      let req = Cc["@mozilla.org/xmlextras/xmlhttprequest;1"].createInstance(Ci.nsIXMLHttpRequest);
+      req.open("GET", "about:buildconfig", false);
+      req.send(null);
+      let changeset = req.responseText.match(/http:\/\/hg.mozilla.org\/[^\"]*/);
+      if (!changeset)
+        return "No changeset on this release.";
+
+      chromeWin.switchToTabHavingURI(changeset, true);
+    }
+  },
+
+  {
+    name: "chkupd history",
+    description: "Show update history.",
+    returnType: "string",
+    exec: function(args, context) {
+      let chromeWin = context.environment.chromeWindow ||
+                      context.environment.chromeDocument.defaultView;
+      let um = Cc['@mozilla.org/updates/update-manager;1'].getService(Ci.nsIUpdateManager);
+      if (!um.getUpdateAt(0))
+        return "No updates installed yet.";
+
+      chromeWin.switchToTabHavingURI("chrome://mozapps/content/update/history.xul", true);
     }
   }
 ]
