@@ -37,9 +37,7 @@ var mozcmd = {
     ],
     returnType: "string",
     exec: function(args, context) {
-      let prefname = "image.animation_mode";
-      let prefs = Services.prefs;
-      prefs.setCharPref(prefname, args.mode);
+      Services.prefs.setCharPref("image.animation_mode", args.mode);
       return "Animation mode is set to '" + prefs.getCharPref(prefname) + "'";
     }
   },
@@ -148,7 +146,7 @@ var mozcmd = {
           max: 100,
         },
         defaultValue: 15,
-        description: "0 = normal; 100 = pitch black. Default = 15"
+        description: "0 = normal; 100 = pitch dark"
       }
     ],
     exec: function(args, context) {

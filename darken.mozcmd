@@ -28,7 +28,7 @@
           max: 100,
         },
         defaultValue: 15,
-        description: "0 = normal; 100 = pitch black. Default = 15"
+        description: "0 = normal; 100 = pitch dark"
       }
     ],
     exec: function(args, context) {
