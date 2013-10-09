@@ -47,13 +47,44 @@ var mozcmd = {
   chkupd: { // check for updates
     name: "chkupd",
     description: "Check " + Services.appinfo.name + " for updates.",
+    params: [
+      {
+        name: "option",
+        description: "No parameter: check for updates; notes: open release notes;\
+                      history: show update history.",
+        type: {
+          name: "selection",
+          data: ["", "notes", "history"]
+        },
+        defaultValue: null,
+      }
+    ],
     exec: function(args, context) {
+      function openURL(aURL) {
+        let chromeWin = context.environment.chromeWindow ||
+                        context.environment.chromeDocument.defaultView;
+        chromeWin.switchToTabHavingURI(aURL, true);
+      }
+
       let um = Cc['@mozilla.org/updates/update-manager;1'].getService(Ci.nsIUpdateManager);
-      let prompter = Cc['@mozilla.org/updates/update-prompt;1'].createInstance(Ci.nsIUpdatePrompt);
-      if (um.activeUpdate && um.activeUpdate.state === "pending")
-        prompter.showUpdateDownloaded(um.activeUpdate);
-      else
-        prompter.checkForUpdates();
+
+      let param = args.option;
+      if (param === "notes") {
+        let relNotesURL = um.getUpdateAt(0).detailsURL;
+        if (/mozilla.com/.test(relNotesURL))
+          relNotesURL = relNotesURL.replace(/mozilla.com/, "mozilla.org");
+        openURL(relNotesURL);
+      }
+      else if (param === "history") {
+        openURL("chrome://mozapps/content/update/history.xul");
+      }
+      else {
+        let prompter = Cc['@mozilla.org/updates/update-prompt;1'].createInstance(Ci.nsIUpdatePrompt);
+        if (um.activeUpdate && um.activeUpdate.state === "pending")
+          prompter.showUpdateDownloaded(um.activeUpdate);
+        else
+          prompter.checkForUpdates();
+      }
     }
   },
 
