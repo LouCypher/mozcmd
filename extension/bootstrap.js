@@ -283,6 +283,16 @@ var mozcmd = {
     }
   },
 
+  tabsontop: {
+    name: "tabsontop",
+    description: "Toggle Tabs on Top",
+    exec: function(args, context) {
+      let prefs = Services.prefs;
+      let prefname = "browser.tabs.onTop";
+      prefs.setBoolPref(prefname, !prefs.getBoolPref(prefname));
+    }
+  },
+
   vs: { // view source
     name: "vs",
     description: "View HTML source of current page or a specified URL.",
