@@ -63,9 +63,9 @@ var mozcmd = {
       }
 
       let um = Cc['@mozilla.org/updates/update-manager;1'].getService(Ci.nsIUpdateManager);
-      let option = args.option;
+      let option = args.option.toLowerCase();
 
-      if (option === "notes") {
+      if (option === "notes" || option === "n") {
         let relNotesURL;
         if (um.getUpdateAt(0))
           relNotesURL = um.getUpdateAt(0).detailsURL;
@@ -79,21 +79,21 @@ var mozcmd = {
         openURL(relNotesURL);
       }
 
-      else if (option === "changeset") {
+      else if (option === "changeset" || option === "c") {
         let req = Cc["@mozilla.org/xmlextras/xmlhttprequest;1"].createInstance(Ci.nsIXMLHttpRequest);
         req.open("GET", "about:buildconfig", false);
         req.send(null);
         let changeset = req.responseText.match(/http:\/\/hg.mozilla.org\/[^\"]*/);
         if (!changeset)
           return "No changeset on this release.";
-        
+
         openURL(changeset);
       }
 
-      else if (option === "history") {
+      else if (option === "history" || option === "h") {
         if (!um.getUpdateAt(0))
           return "No updates installed yet.";
-        
+
         openURL("chrome://mozapps/content/update/history.xul");
       }
 
