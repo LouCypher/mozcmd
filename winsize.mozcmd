@@ -11,6 +11,7 @@
   {
     name: "winsize",
     description: "Resize browser window. If no parameters entered, display current window size.",
+    runAt: "client",
     params: [
       {
         name: "width",

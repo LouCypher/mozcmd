@@ -19,6 +19,7 @@
   {
     name: "darken",
     description: "Darken content area.",
+    runAt: "client",
     params: [
       {
         name: "Dark level",

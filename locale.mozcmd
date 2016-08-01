@@ -30,7 +30,9 @@
         ---
         I couldn't find another way to change browser locale without using preferences
       */
-      let prefs = Services.prefs;
+      let prefs = Components.classes["@mozilla.org/preferences-service;1"]
+                        .getService(Components.interfaces.nsIPrefBranch);
+
       let msgPrefix = "Browser language: '";
       let msgSuffix = "'";
       let lang = args.langID;

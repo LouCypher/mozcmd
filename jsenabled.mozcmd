@@ -22,7 +22,8 @@
     exec: function(args, context) {
       let contentWin = context.environment.window || context.environment.contentDocument.defaultView;
       let prefname = "javascript.enabled";
-      let prefs = Services.prefs;
+      let prefs = Components.classes["@mozilla.org/preferences-service;1"]
+                        .getService(Components.interfaces.nsIPrefBranch);
       let jsEnabled = prefs.getBoolPref(prefname);
       prefs.setBoolPref(prefname, !jsEnabled);
       if (args.reload)

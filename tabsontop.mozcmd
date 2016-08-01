@@ -12,7 +12,8 @@
     name: "tabsontop",
     description: "Toggle Tabs on Top",
     exec: function(args, context) {
-      let prefs = Services.prefs;
+      let prefs = Components.classes["@mozilla.org/preferences-service;1"]
+                        .getService(Components.interfaces.nsIPrefBranch);
       let prefname = "browser.tabs.onTop";
       prefs.setBoolPref(prefname, !prefs.getBoolPref(prefname));
     }
