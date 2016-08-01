@@ -10,7 +10,7 @@
 [
   {
     name: "chkupd",
-    description: "Check " + Application.name + " for updates.",
+    description: "Check for updates.",
     params: [
       {
         name: "option",
@@ -22,6 +22,7 @@
     ],
     returnType: "string",
     exec: function(args, context) {
+      var Cc = Components.classes; var Ci = Components.interfaces;
       function openURL(aURL) {
         let chromeWin = context.environment.chromeWindow ||
                         context.environment.chromeDocument.defaultView;

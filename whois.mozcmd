@@ -11,6 +11,7 @@
   {
     name: "whois",
     description: "Whois lookup using DomainTools web service.",
+    runAt: "client",
     params: [
       {
         name: "domain",
@@ -34,9 +35,11 @@
       if (!hostname) {
         return contentWin.location.protocol + " scheme is not supported.";
       }
+      var eTLDsvc = Components.classes["@mozilla.org/network/effective-tld-service;1"]
+                  .getService(Components.interfaces.nsIEffectiveTLDService);
 
-      let eTLDsvc = Services.eTLD;
-      let eTLD, URI = Services.io.newURI("http://" + hostname, null, null);
+      let eTLD, URI = Components.classes["@mozilla.org/network/io-service;1"]
+                .getService(Components.interfaces.nsIIOService).newURI("http://" + hostname, null, null);
       try {
         eTLD = eTLDsvc.getBaseDomain(URI);
       } catch (ex) {

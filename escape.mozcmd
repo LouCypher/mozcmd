@@ -21,6 +21,7 @@
     ],
     returnType: "string",
     exec: function(args, context) {
+      var Cc = Components.classes; var Ci = Components.interfaces;
       let contentWin = context.environment.window || context.environment.contentDocument.defaultView;
       let string = args.string;
       if (!string)
@@ -45,6 +46,7 @@
     ],
     returnType: "string",
     exec: function(args, context) {
+      var Cc = Components.classes; var Ci = Components.interfaces;
       let string = args.string;
       let unescaped = decodeURIComponent(string);
       let clipboardHelper = Cc["@mozilla.org/widget/clipboardhelper;1"].

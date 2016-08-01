@@ -11,6 +11,7 @@
   {
     name: "vs",
     description: "View HTML source of current page or a specified URL.",
+    runAt: "client",
     params: [
       {
         name: "url",
@@ -41,7 +42,9 @@
   {
     name: "vrs",
     description: "View rendered source of current page.",
+    runAt: "client",
     exec: function(args, context) {
+      var Cc = Components.classes; var Ci = Components.interfaces;
       let environment = context.environment;
       let contentDoc = environment.document || environment.contentDocument;
       let chromeWin = environment.chromeWindow || environment.chromeDocument.defaultView;

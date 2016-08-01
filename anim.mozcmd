@@ -23,8 +23,10 @@
     ],
     returnType: "string",
     exec: function(args, context) {
-      Services.prefs.setCharPref("image.animation_mode", args.mode);
-      return "Animation mode is set to '" + prefs.getCharPref(prefname) + "'";
+      let prefs = Components.classes["@mozilla.org/preferences-service;1"]
+                    .getService(Components.interfaces.nsIPrefService).getBranch("image.");
+      prefs.setCharPref("animation_mode", args.mode);
+      return "Animation mode is set to '" + prefs.getCharPref("animation_mode") + "'";
     }
   }
 ]
